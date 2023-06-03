@@ -1,31 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import api from '../utils/api';
+import React from 'react';
 import Card from './Card';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 function Main(props) {
-  const [userName, setUserName] = useState('');
-  const [userDescription, setUserDescription] = useState('');
-  const [userAvatar, setUserAvatar] = useState('');
-  const [cards, setCards] = useState([]);
-
-  useEffect(() => {
-    Promise.all([api.getUserInfo(), api.getInitialCards()])
-      .then(([userData, cardsData]) => {
-        setUserName(userData.name);
-        setUserDescription(userData.about);
-        setUserAvatar(userData.avatar);
-        setCards(cardsData);
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  }, []);
+  const currentUser = React.useContext(CurrentUserContext);
 
   return (
     <main className="content">
       <section className="profile">
         <div className="profile__avatar-edit">
-          <img className="profile__avatar" src={userAvatar} alt="Фото Жака-Ива Кусто." />
+          <img className="profile__avatar" src={currentUser.avatar} alt="Фото Жака-Ива Кусто." />
           <button
             className="profile__avatar-button"
             type="button"
@@ -34,14 +18,14 @@ function Main(props) {
           />
         </div>
         <div className="profile__info">
-          <h1 className="profile__name">{userName}</h1>
+          <h1 className="profile__name">{currentUser.name}</h1>
           <button
             className="profile__edit-button hover-link"
             type="button"
             aria-label="Редактировать"
             onClick={props.onEditProfile}
           />
-          <p className="profile__occupation">{userDescription}</p>
+          <p className="profile__occupation">{currentUser.about}</p>
         </div>
         <button
           className="profile__add-button hover-link"
@@ -52,8 +36,14 @@ function Main(props) {
       </section>
       <section className="elements" aria-label="Галерея">
         <ul className="elements__list">
-          {cards.map(card => (
-            <Card key={card._id} onCardClick={props.onCardClick} card={card} />
+          {props.cards.map(card => (
+            <Card
+              key={card._id}
+              card={card}
+              onCardClick={props.onCardClick}
+              onCardLike={props.onCardLike}
+              onCardDelete={props.onCardDeleteConfirmation}
+            />
           ))}
         </ul>
       </section>

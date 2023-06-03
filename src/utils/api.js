@@ -14,8 +14,10 @@ class Api {
   }
 
   // Универсальный метод запроса с проверкой ответа
-  _request(url, options) {
-    return fetch(`${this._baseUrl}/${url}`, options).then(res => this._getResponse(res));
+  async _request(url, options) {
+    const response = await fetch(`${this._baseUrl}/${url}`, options);
+
+    return this._getResponse(response);
   }
 
   // Загрузка информации о пользователе с сервера
@@ -60,7 +62,12 @@ class Api {
     });
   }
 
-  // Постановка лайка карточки
+  // Переключение лайка карточки
+  changeLikeCardStatus(_id, isLiked) {
+    return isLiked ? this.deleteLike(_id) : this.setLike(_id);
+  }
+
+  // Установка лайка карточки
   setLike(cardId) {
     return this._request(`cards/${cardId}/likes`, {
       method: 'PUT',
